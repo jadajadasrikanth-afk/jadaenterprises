@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signIn } from "../lib/auth";
-import { callEdgeFunction } from "../lib/supabaseClient";
+import { supabase, callEdgeFunction } from "../lib/supabaseClient";
 
 export default function Login() {
   const [mobile, setMobile] = useState("");
@@ -15,9 +15,11 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await signIn(mobile, password);
+      const user = await signIn(mobile, password);
       await callEdgeFunction("log-action", { action: "login" }).catch(() => {});
-      navigate("/profile");
+
+      const { data: me } = await supabase.from("profiles").select("is_admin").eq("id", user.id).single();
+      navigate(me?.is_admin ? "/admin" : "/profile");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase, callEdgeFunction } from "../lib/supabaseClient";
 import { signOut } from "../lib/auth";
 import { uploadDocument } from "../lib/storage";
@@ -14,6 +14,7 @@ interface ProfileRow {
   gps_lng: number | null;
   id_proof_file_path: string | null;
   shop_photo_file_path: string | null;
+  is_admin: boolean;
 }
 
 export default function Profile() {
@@ -97,6 +98,11 @@ export default function Profile() {
     <div className="phone">
       <div className="brand">MY PROFILE</div>
       <h1>{profile.mobile_number}</h1>
+      {profile.is_admin && (
+        <Link to="/admin" style={{ display: "block", marginBottom: 16 }}>
+          <button type="button">Go to Admin Dashboard</button>
+        </Link>
+      )}
 
       <label>Full Name</label>
       <input value={profile.full_name ?? ""} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} />
